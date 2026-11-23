@@ -1,0 +1,25 @@
+name: DevOps Infrastructure CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python and Ansible Lint
+        run: |
+          pip install ansible ansible-lint
+          ansible-lint ansible/setup-k3s.yml
+
+      - name: Validate Kubernetes manifests
+        uses: yokeTH/kubeconform-action@v1
+        with:
+          files: k8s/
+          kubernetes-version: 1.31.0
